@@ -1,0 +1,72 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="DiagramaE_R">
+        <xs:complexType>
+            
+            <xs:sequence>
+                <xs:element name="Nombre" type="xs:string"/>
+                <!-- Estructura de las entidades -->
+                <xs:element name="Entidad" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+
+                            <xs:element name="nombreEntidad" />
+                            <xs:sequence>
+                                <!-- Estructura de cada atributo -->
+                                <xs:element name="Atributo"
+                                    maxOccurs="unbounded">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="tipo_dato" type="xs:string" />
+                                            <xs:element name="nombre" type="xs:string" />
+                                            <xs:element name="llavePrimaria"
+                                                type="xs:boolean" minOccurs="0"
+                                                maxOccurs="unbounded" />
+                                            <xs:element name="autoincrementable" type="xs:boolean" minOccurs="0"/>
+                                            <xs:element name="llaveForanea"
+                                                type="xs:boolean" minOccurs="0"
+                                                maxOccurs="unbounded" />
+                                            <xs:element name="llaveUnica" type="xs:boolean"
+                                                minOccurs="0" maxOccurs="unbounded" />
+                                            <xs:element name="nullable" type="xs:boolean"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <!-- Estructura de las relaciones -->
+                <xs:element name="Relaciones">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Relacion" minOccurs="0"
+                                maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="EntidadPrincipal" type="xs:string" />
+                                        <xs:element name="EntidadDependiente" type="xs:string" />
+                                        <xs:choice>
+                                            <xs:element name="RelacionUnoAMuchos"
+                                                type="xs:string" />
+                                            <xs:element name="RelacionUnoAUno"
+                                                type="xs:string" />
+                                        </xs:choice>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+
+                </xs:element>
+
+
+            </xs:sequence>
+        </xs:complexType>
+
+
+    </xs:element>
+
+</xs:schema>
