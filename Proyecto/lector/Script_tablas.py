@@ -10,7 +10,7 @@ for entidad in entidades:
     script += f"CREATE TABLE IF NOT EXISTS `{entidad[0].text}`(\n"
     for i, atributo in enumerate(atributos):
         script += f"\t`{atributo[1].text}` "
-        if(atributo[0].text == "VARCHAR"):
+        if (atributo[0].text == "VARCHAR"):
             script += f"{atributo[0].text}(255)"
         else:
             script += f"{atributo[0].text}"
@@ -31,6 +31,7 @@ for entidad in entidades:
 
     script += ");\n"
 
+    # escribir cada uno de los endpoint
 relaciones = root.find("Relaciones").findall("Relacion")
 for relacion in relaciones:
     for entidad in entidades:
@@ -38,12 +39,14 @@ for relacion in relaciones:
             clase_padre = entidad
         elif entidad[0].text == relacion.find("EntidadDependiente").text:
             clase_hija = entidad
-    script += f"ALTER TABLE `{clase_hija[0].text}`\n\tADD CONSTRAINT `FK_{clase_hija[0].text}_{clase_padre[0].text}`\n"
+    script += f"ALTER TABLE `{clase_hija[0].text}`\n\tADD CONSTRAINT `FK_{
+        clase_hija[0].text}_{clase_padre[0].text}`\n"
     for atributo in clase_padre.findall("Atributo"):
         if atributo.find("llavePrimaria") is not None:
             llave = atributo.find("nombre").text
-            
-    script += f" \t\tFOREIGN KEY (`{llave}`) REFERENCES `{clase_padre[0].text}` (`{llave}`) ON DELETE Restrict ON UPDATE Restrict"
+
+    script += f" \t\tFOREIGN KEY (`{llave}`) REFERENCES `{clase_padre[0].text}` (`{
+        llave}`) ON DELETE Restrict ON UPDATE Restrict"
     script += "\n;\n"
 
 os.makedirs("./database", exist_ok=True)

@@ -1,0 +1,16 @@
+FROM node:latest
+
+
+RUN mkdir -p /usr/Proyecto/backend/app
+
+WORKDIR /usr/Proyecto/backend
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3200
+
+CMD ["npm", "start"]
