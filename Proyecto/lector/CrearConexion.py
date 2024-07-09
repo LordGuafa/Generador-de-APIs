@@ -3,7 +3,6 @@ import os
 
 root = ET.parse("lector/prueba.xml").getroot()
 nombre_db = root.find("Nombre")
-aux = ""
 entidades = root.findall("Entidad")
 code = """
 const express = require("express");
@@ -46,9 +45,9 @@ for entidad in entidades:
     code += f"""app.get("/{entidad[0].text}",{
         entidad[0].text.lower()}.getAll);\n"""
     code += f"""app.get("/{entidad[0].text}/*",{
-        entidad[0].text.lower()}.getAll);\n"""
+        entidad[0].text.lower()}.noExist);\n"""
     code += f"""app.get("/{entidad[0].text}/:{primarykey}",{
-        entidad[0].text.lower()}.getAll);\n"""
+        entidad[0].text.lower()}.get);\n"""
     code += f"""app.put("/{entidad[0].text}/:{primarykey}",{
         entidad[0].text.lower()}.update);\n"""
     code += f"""app.delete("/{entidad[0].text}/:{primarykey}",{

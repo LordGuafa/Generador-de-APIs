@@ -39,14 +39,14 @@ for relacion in relaciones:
             clase_padre = entidad
         elif entidad[0].text == relacion.find("EntidadDependiente").text:
             clase_hija = entidad
-    script += f"ALTER TABLE `{clase_hija[0].text}`\n\tADD CONSTRAINT `FK_{
-        clase_hija[0].text}_{clase_padre[0].text}`\n"
+    script += f"""ALTER TABLE `{clase_hija[0].text}`\n\tADD CONSTRAINT `FK_{
+        clase_hija[0].text}_{clase_padre[0].text}`\n"""
     for atributo in clase_padre.findall("Atributo"):
         if atributo.find("llavePrimaria") is not None:
             llave = atributo.find("nombre").text
 
-    script += f" \t\tFOREIGN KEY (`{llave}`) REFERENCES `{clase_padre[0].text}` (`{
-        llave}`) ON DELETE Restrict ON UPDATE Restrict"
+    script += f"""\t\tFOREIGN KEY (`{llave}`) REFERENCES `{clase_padre[0].text}` (`{
+        llave}`) ON DELETE Restrict ON UPDATE Restrict"""
     script += "\n;\n"
 
 os.makedirs("./database", exist_ok=True)
