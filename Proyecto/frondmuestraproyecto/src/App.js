@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import './styles/style.css';
-
+import axios from './api/axios';
 function App() {
+  
   const [file, setFile] = useState(null);
 
   const handleFileChange = (event) => {
@@ -30,10 +30,8 @@ function App() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://tu-servidor.com/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await axios.post('generate_project', formData, {
+        
       });
 
       if (response.status === 200) {
