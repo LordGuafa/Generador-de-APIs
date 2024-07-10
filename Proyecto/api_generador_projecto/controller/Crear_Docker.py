@@ -1,3 +1,6 @@
+
+def create_docker(filename):
+  code = """
 version: '3.3'
 services:
 
@@ -15,11 +18,14 @@ services:
       - ./database:/docker-entrypoint-initdb.d
     networks:
       - login-network
-
 volumes:
   login-data:
     driver: local
 
 networks:
   login-network:
-    driver: bridge
+    driver: bridge"""
+        
+  file_path = f"api's/{filename[:-4]}/docker-compose.yml"
+  with open(file_path, 'w') as file:
+      file.write(code)
