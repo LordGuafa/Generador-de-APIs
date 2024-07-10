@@ -1,32 +1,37 @@
 
 const express = require("express");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise"); // Utiliza mysql2/promise para soporte de async/await
 const bodyParser = require("body-parser");
-const fs = require("fs");
-clientes=require(clientes.controller.js)
-prestamos=require(prestamos.controller.js)
-copias=require(copias.controller.js)
-peliculas=require(peliculas.controller.js)
+
+const clientes=require('./controllers/clientes.controller.js')
+const prestamos=require('./controllers/prestamos.controller.js')
+const copias=require('./controllers/copias.controller.js')
+const peliculas=require('./controllers/peliculas.controller.js')
 const path = require("path");
 // Crear una instancia de Express
 const app = express();
 app.use(express.json());
+
 // Configurar la conexion a la base de datos MySQL
-const connection = mysql.createConnection({
-  host: "localhost", // Cambia esto a tu host de la base de datos
-  user: "root", // Cambia esto a tu usuario de la base de datos
-  password: "1234", // Cambia esto a tu contrasena de la base de datos
-  database: "Prueba", // Cambia esto a tu base de datos
+const dbConfig = {
+  host: "localhost",
+  user: "root",
+  password: "1234",
+  database: "Prueba",
+};
+
+// Middleware para inyectar la conexión de la base de datos en las solicitudes
+app.use(async (req, res, next) => {
+  try {
+    req.db = await mysql.createConnection(dbConfig);
+    await req.db.connect();
+    next();
+  } catch (err) {
+    console.error("Error connecting to the database:", err.stack);
+    res.status(500).json({ error: "Database connection failed" });
+  }
 });
 
-// Conectar a la base de datos
-connection.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err.stack);
-    return;
-  }
-  console.log("Connected to the database as id " + connection.threadId);
-});
 //Endpoints para Clientes
 app.post("/Clientes",clientes.create);
 app.get("/Clientes",clientes.getAll);

@@ -25,19 +25,19 @@ CREATE TABLE IF NOT EXISTS `Copias`(
 CREATE TABLE IF NOT EXISTS `Peliculas`(
 	`id_pelicula` INT PRIMARY KEY AUTO_INCREMENT,
 	`titulo` VARCHAR(255) NOT NULL,
-	`año` INT NULL,
+	`anno` INT NULL,
 	`critica` VARCHAR(255) NULL,
 	`caratula` VARCHAR(255) NULL
 );
 ALTER TABLE `Prestamos`
 	ADD CONSTRAINT `FK_Prestamos_Clientes`
- 		FOREIGN KEY (`cod_cliente`) REFERENCES `Clientes` (`cod_cliente`) ON DELETE Restrict ON UPDATE Restrict
+		FOREIGN KEY (`cod_cliente`) REFERENCES `Clientes` (`cod_cliente`) ON DELETE Restrict ON UPDATE Restrict
 ;
 ALTER TABLE `Prestamos`
 	ADD CONSTRAINT `FK_Prestamos_Copias`
- 		FOREIGN KEY (`n_copia`) REFERENCES `Copias` (`n_copia`) ON DELETE Restrict ON UPDATE Restrict
+		FOREIGN KEY (`n_copia`) REFERENCES `Copias` (`n_copia`) ON DELETE Restrict ON UPDATE Restrict
 ;
 ALTER TABLE `Copias`
 	ADD CONSTRAINT `FK_Copias_Peliculas`
- 		FOREIGN KEY (`id_pelicula`) REFERENCES `Peliculas` (`id_pelicula`) ON DELETE Restrict ON UPDATE Restrict
+		FOREIGN KEY (`id_pelicula`) REFERENCES `Peliculas` (`id_pelicula`) ON DELETE Restrict ON UPDATE Restrict
 ;

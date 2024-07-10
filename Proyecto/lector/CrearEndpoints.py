@@ -4,6 +4,7 @@ import os
 root = ET.parse("lector/prueba.xml").getroot()
 nombre_db = root.find("Nombre")
 entidades = root.findall("Entidad")
+code = ""
 interrogantes = ""
 listaAtributos = ""
 arrayAtributos = []
@@ -23,20 +24,20 @@ for entidad in entidades:
             if i < len(atributos)-1:
                 listaAtributos += ", "
                 interrogantes += ", "
-    code = f"""const express = require("express");
-const mysql = require("mysql2");
-const bodyParser = require("body-parser");
-const fs = require("fs");
+    code += f"""
+
 const {entidad[0].text}=
 """+'{\n'
     code += "get: async(req,res)=>{\n "
     code += "const{"
     code += f"{primarykey}"+"}=req.params;"
     code += """ try {
-    const connection = await getConnection();
-    const query = 'SELECT * FROM users WHERE cod_cliente = ?';"""
-    code += f"const [results] = await connection.execute(query, [{primarykey}]);"
-    code += """await connection.end();
+    """
+    code += f"""const query = 'SELECT * FROM {
+        entidad[0].text} WHERE cod_cliente = ?';"""
+    code += f"""const [results] = await req.db.execute(query, [{
+        primarykey}]);"""
+    code += """await req.db.end();
     if (results.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -47,10 +48,10 @@ const {entidad[0].text}=
   },\n"""
     code += """getAll: async (req, res) => {
   try {
-    const connection = await getConnection();
-    const query = 'SELECT * FROM users';
-    const [results] = await connection.execute(query);
-    await connection.end();
+    """
+    code += f"""const query = 'SELECT * FROM {entidad[0].text}';"""
+    code += """ const [results] = await req.db.execute(query);
+    await req.db.end();
     res.json(results);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -59,54 +60,92 @@ const {entidad[0].text}=
     code += """noExist: (req, res) => {
         res.status(404).send("No existe");
       },
-    
+
     """
     code += """create: async(req,res)=>{
       const{"""
     code += f'{listaAtributos}'
     code += "}= req.body\n"
     code += """try{
-      const connection = await getConnection();"""
-    code += f"""const query = 'INSERT INTO users ("""
+      """
+    code += f"""const query = 'INSERT INTO {entidad[0].text} ("""
     cont = 0
     for i in arrayAtributos:
-        cont += 1
-        code += i
-        if cont < len(arrayAtributos):
-            code += ", "
-    code += f""") VALUES ({interrogantes})';"""
-    code += f"""const [results] = await connection.execute(query, [{listaAtributos}])
-    await connection.end();"""
+        if atributo.find("autoincrementable") is not None:
+            code += ""
+        else:
+            cont += 1
+            code += i
+            if cont < len(arrayAtributos):
+                code += ", "
+    code += f""") VALUES ({interrogantes})';\n"""
+    code += f"""const [results] = await req.db.execute(query, [{listaAtributos}])
+    await req.db.end();"""
     code += "res.status(201).json({"
     code += f'{primarykey}:results.insertId, {listaAtributos}'
     code += """});
     } catch (error) {
         res.status(500).json({ error: error.message });
       }
-    }
+    },\n
       """
     code += """update: async(req,res)=>{
       const{"""
     code += f'{primarykey}'
-    code += """}req.params;
+    code += """}=req.params;
     const{"""
     code += f"{listaAtributos}"+"}=req.body;\n"
     code += """try{
-    const connection= await getConnection();\n
     """
-    code += f"""'const query='UPDATE {entidad[0].text} SET'"""
+    code += f"""const query='UPDATE {entidad[0].text} SET """
+    cont = 0
     for i in arrayAtributos:
-        cont += 1
-        code += i
+        if atributo.find("autoincrementable") is not None:
+            code += ""
+        else:
+            cont += 1
+            code += i
         if cont < len(arrayAtributos):
             code += " = ?, "
-    code += f"WHERE{primarykey}=?;\n"
-    code
+    code += f" WHERE {primarykey} = ? ';\n"
+    code += f"""const[results]=await req.db.execute(query,[{
+        listaAtributos},{primarykey}]);
+        await req.db.end();"""
+    code += """if(results.affectedRows===0){
+      return res.status(404).json({error:error.message});
+      }
+      }
+      catch(error){
+        res.status(500).json({error:error.message})}
+        },
+
+        """
+    code += """delete: async(req,res)=>{
+      const{"""
+    code += f'{primarykey}'+'}=req.params;\n'
+    code += """try {
+    \n
+    """
+    code += f"""const query = 'DELETE FROM {entidad[0].text} WHERE {primarykey} = ?';
+    const [results] = await req.db.execute(query, [{primarykey}]);
+    await req.db.end();\n"""
+    code += """if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }\n}\n}\n
+  """
+    code += f'module.exports={entidad[0].text};'
     os.makedirs("./backend/controllers", exist_ok=True)
     file_path = f'backend/controllers/{entidad[0].text}.controller.js'
     with open(file_path, 'w') as file:
         file.write(code)
-
-
+    code = ""
+    listaAtributos = ""
+    arrayAtributos.clear()
+    interrogantes = ""
+print(arrayAtributos)
 # app.put("/Clientes/:cod_cliente", clientes.update)
 # app.delete("/Clientes/:cod_cliente", clientes.delete);

@@ -128,7 +128,7 @@
         </Atributo>
         <Atributo>
             <tipo_dato>INT</tipo_dato>
-            <nombre>año</nombre>
+            <nombre>anno</nombre>
             <nullable>true</nullable>
         </Atributo>
         <Atributo>
