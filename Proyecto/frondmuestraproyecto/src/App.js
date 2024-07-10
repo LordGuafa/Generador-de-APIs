@@ -4,6 +4,7 @@ import axios from './api/axios';
 function App() {
   
   const [file, setFile] = useState(null);
+  const [zipFileUrl, setZipFileUrl] = useState(null);
 
   const handleFileChange = (event) => {
     const uploadedFile = event.target.files[0];
@@ -31,11 +32,14 @@ function App() {
 
     try {
       const response = await axios.post('generate_project', formData, {
-        
+        responseType: 'blob',
       });
 
       if (response.status === 200) {
         console.log('Archivo subido exitosamente');
+        const zipBlob = new Blob([response.data], { type: 'application/zip' });
+        const zipUrl = URL.createObjectURL(zipBlob);
+        setZipFileUrl(zipUrl);
       } else {
         console.error('Error al subir el archivo');
       }
@@ -72,7 +76,14 @@ function App() {
           <h2>Archivo subido:</h2>
           <p>Nombre: {file.name}</p>
           <p>Tamaño: {file.size} bytes</p>
-          <button onClick={handleFileUpload}>Subir Archivo</button>
+          {!zipFileUrl ? (
+            <button onClick={handleFileUpload}>Subir Archivo</button>
+          ) : (
+            <a href={zipFileUrl} download="proyecto.zip">
+              <button>Descargar Proyecto</button>
+            </a>
+          )}
+
         </div>
       )}
     </div>
