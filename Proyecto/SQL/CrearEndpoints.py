@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 
-root = ET.parse("lector/prueba.xml").getroot()
+root = ET.parse("./docs/prueba.xml").getroot()
 nombre_db = root.find("Nombre")
 entidades = root.findall("Entidad")
 code = ""
@@ -146,6 +146,3 @@ const {entidad[0].text}=
     listaAtributos = ""
     arrayAtributos.clear()
     interrogantes = ""
-print(arrayAtributos)
-# app.put("/Clientes/:cod_cliente", clientes.update)
-# app.delete("/Clientes/:cod_cliente", clientes.delete);
