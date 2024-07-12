@@ -107,13 +107,14 @@ const {entidad[0].text}=
             code += i
         if cont < len(arrayAtributos):
             code += " = ?, "
-    code += f" WHERE {primarykey} = ? ';\n"
+    code += f" = ? WHERE {primarykey} = ? ';\n"
     code += f"""const[results]=await req.db.execute(query,[{
         listaAtributos},{primarykey}]);
         await req.db.end();"""
     code += """if(results.affectedRows===0){
       return res.status(404).json({error:error.message});
       }
+       res.json({ message: "Client updated successfully" });
       }
       catch(error){
         res.status(500).json({error:error.message})}

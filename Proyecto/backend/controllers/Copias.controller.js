@@ -1,71 +1,43 @@
 
-
+const copias=require("../models/copias.model")
 const Copias=
 {
 get: async(req,res)=>{
- const{n_copia}=req.params; try {
-    const query = 'SELECT * FROM Copias WHERE cod_cliente = ?';const [results] = await req.db.execute(query, [n_copia]);await req.db.end();
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-     res.json(results[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-  },
-getAll: async (req, res) => {
-  try {
-    const query = 'SELECT * FROM Copias'; const [results] = await req.db.execute(query);
-    await req.db.end();
-    res.json(results);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-},noExist: (req, res) => {
-        res.status(404).send("No existe");
-      },
-
-    create: async(req,res)=>{
-      const{deteriorada, formato, id_pelicula, precio_alquiler}= req.body
-try{
-      const query = 'INSERT INTO Copias (deteriorada, formato, id_pelicula, precio_alquiler) VALUES (?, ?, ?, ?)';
-const [results] = await req.db.execute(query, [deteriorada, formato, id_pelicula, precio_alquiler])
-    await req.db.end();res.status(201).json({n_copia:results.insertId, deteriorada, formato, id_pelicula, precio_alquiler});
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
+ const{n_copia}=req.params;const temp= await copias.findOne({n_copia});res.status(200).send(temp);
     },
-
-      update: async(req,res)=>{
-      const{n_copia}=req.params;
-    const{deteriorada, formato, id_pelicula, precio_alquiler}=req.body;
-try{
-    const query='UPDATE Copias SET deteriorada = ?, formato = ?, id_pelicula = ?, precio_alquiler WHERE n_copia = ? ';
-const[results]=await req.db.execute(query,[deteriorada, formato, id_pelicula, precio_alquiler,n_copia]);
-        await req.db.end();if(results.affectedRows===0){
-      return res.status(404).json({error:error.message});
-      }
-      }
-      catch(error){
-        res.status(500).json({error:error.message})}
+    getAll: async(req,res)=>{const temp= await copias.find();
+    res.status(200).send(temp);
+    },
+noExist: async(req,res)=>{
+        res.status(404).send("No existe")
         },
 
-        delete: async(req,res)=>{
-      const{n_copia}=req.params;
-try {
-    
-
-    const query = 'DELETE FROM Copias WHERE n_copia = ?';
-    const [results] = await req.db.execute(query, [n_copia]);
-    await req.db.end();
-if (results.affectedRows === 0) {
-      return res.status(404).json({ error: 'User not found' });
+        create: async(req,res)=>{try{const temp= new copias(req.body);
+    const saved= await temp.save();
+    res.status(201).send(saved._id);
     }
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+catch (error) {
+    res.status(400).send(error);
+  }},
+update: async(req,res)=>{const{ n_copia}=req.params
+        try {
+        const updated = await copias.findOneAndUpdate({n_copia}, 
+req.body,
+{ new : true, runValidators:true });
+        if(!updated){
+          return  res.status(404).send("No encontrado");
+            }
+        res.status(200).send(updated);
+        } catch (error){
+            res.status(400).send(error)
+        }
+},
+        delete: async (req,res)=>{
+        const{n_copia}=req.params;
+const temp = await copias
+        .findOne({n_copia});
+if(temp){
+        await copias.deleteOne({n_copia});}
+res.status(200).send("Se ha eliminado con exito");}
 }
-}
-
-  module.exports=Copias;
+module.exports=Copias;

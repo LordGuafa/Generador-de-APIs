@@ -1,71 +1,43 @@
 
-
+const prestamos=require("../models/prestamos.model")
 const Prestamos=
 {
 get: async(req,res)=>{
- const{id_prestamo}=req.params; try {
-    const query = 'SELECT * FROM Prestamos WHERE cod_cliente = ?';const [results] = await req.db.execute(query, [id_prestamo]);await req.db.end();
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-     res.json(results[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-  },
-getAll: async (req, res) => {
-  try {
-    const query = 'SELECT * FROM Prestamos'; const [results] = await req.db.execute(query);
-    await req.db.end();
-    res.json(results);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-},noExist: (req, res) => {
-        res.status(404).send("No existe");
-      },
-
-    create: async(req,res)=>{
-      const{fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia}= req.body
-try{
-      const query = 'INSERT INTO Prestamos (fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia) VALUES (?, ?, ?, ?, ?)';
-const [results] = await req.db.execute(query, [fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia])
-    await req.db.end();res.status(201).json({id_prestamo:results.insertId, fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia});
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-      }
+ const{id_prestamo}=req.params;const temp= await prestamos.findOne({id_prestamo});res.status(200).send(temp);
     },
-
-      update: async(req,res)=>{
-      const{id_prestamo}=req.params;
-    const{fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia}=req.body;
-try{
-    const query='UPDATE Prestamos SET fecha_pretamo = ?, fecha_tope = ?, fecha_entrega = ?, cod_cliente = ?, n_copia WHERE id_prestamo = ? ';
-const[results]=await req.db.execute(query,[fecha_pretamo, fecha_tope, fecha_entrega, cod_cliente, n_copia,id_prestamo]);
-        await req.db.end();if(results.affectedRows===0){
-      return res.status(404).json({error:error.message});
-      }
-      }
-      catch(error){
-        res.status(500).json({error:error.message})}
+    getAll: async(req,res)=>{const temp= await prestamos.find();
+    res.status(200).send(temp);
+    },
+noExist: async(req,res)=>{
+        res.status(404).send("No existe")
         },
 
-        delete: async(req,res)=>{
-      const{id_prestamo}=req.params;
-try {
-    
-
-    const query = 'DELETE FROM Prestamos WHERE id_prestamo = ?';
-    const [results] = await req.db.execute(query, [id_prestamo]);
-    await req.db.end();
-if (results.affectedRows === 0) {
-      return res.status(404).json({ error: 'User not found' });
+        create: async(req,res)=>{try{const temp= new prestamos(req.body);
+    const saved= await temp.save();
+    res.status(201).send(saved._id);
     }
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+catch (error) {
+    res.status(400).send(error);
+  }},
+update: async(req,res)=>{const{ id_prestamo}=req.params
+        try {
+        const updated = await prestamos.findOneAndUpdate({id_prestamo}, 
+req.body,
+{ new : true, runValidators:true });
+        if(!updated){
+          return  res.status(404).send("No encontrado");
+            }
+        res.status(200).send(updated);
+        } catch (error){
+            res.status(400).send(error)
+        }
+},
+        delete: async (req,res)=>{
+        const{id_prestamo}=req.params;
+const temp = await prestamos
+        .findOne({id_prestamo});
+if(temp){
+        await prestamos.deleteOne({id_prestamo});}
+res.status(200).send("Se ha eliminado con exito");}
 }
-}
-
-  module.exports=Prestamos;
+module.exports=Prestamos;

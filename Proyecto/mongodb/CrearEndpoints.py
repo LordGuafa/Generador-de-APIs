@@ -26,7 +26,7 @@ for entidad in entidades:
                 listaAtributos += ", "
                 interrogantes += ", "
     code += f"""
-const{modelo}=require(".models/{modelo}.model")
+const {modelo}=require("../models/{modelo}.model")
 const {entidad[0].text}=
 """+'{\n'
     code += "get: async(req,res)=>{\n "
@@ -35,36 +35,43 @@ const {entidad[0].text}=
     code += f"const temp= await {modelo}.findOne("+"{"
     code += f"{primarykey}"+"});"
     code += """res.status(200).send(temp);
-    },"""
+    },
+    """
     code += """getAll: async(req,res)=>{"""
-    code += f"""const temp= await{modelo}.find();
+    code += f"""const temp= await {modelo}.find();
     res.status(200).send(temp);
-    """+"},"
+    """+"},\n"
     code += """noExist: async(req,res)=>{
         res.status(404).send("No existe")
         },
+
         """
     code += "create: async(req,res)=>{"
-    code += f"""const temp= new{modelo}(req.body);
+    code += "try{" + f"""const temp= new {modelo}(req.body);
     const saved= await temp.save();
     res.status(201).send(saved._id);
-    """+"},"
-    code += """update: async(req,res)=>{
-        const{"""
-    code += f"{primarykey}"+"}=req.params;\n"
-    code += f"""const temp = await {modelo}
-        .findOne("""+"{"+f"{primarykey}"+"});\n"
-    code += """Object.assing(temp,req.body);
-    await user.save();
-    res.status(204);
-    """+"},"
-    code += """destroy: async (req,res)=>{
+    """+"}\n"+"""catch (error) {
+    res.status(400).send(error);
+  }""" + "},\n"
+    code += """update: async(req,res)=>{"""+"const{"+f' {primarykey}'+"}=req.params"+"""
+        try {
+        const updated = await """+f'{modelo}.findOneAndUpdate('+"{"+f'{primarykey}'+"""}, \nreq.body,\n{ new : true, runValidators:true });
+        if(!updated){
+          return  res.status(404).send("No encontrado");
+            }
+        res.status(200).send(updated);
+        } catch (error){
+            res.status(400).send(error)
+        }\n},
+        """
+
+    code += """delete: async (req,res)=>{
         const{"""
     code += f"{primarykey}"+"}=req.params;\n"
     code += f"""const temp = await {modelo}
         .findOne("""+"{"+f"{primarykey}"+"});\n"
     code += """if(temp){
-        await """+f'{modelo}.deleteOne('+'{'+f'{primarykey}'+'});}\n}\n}\n'
+        await """+f'{modelo}.deleteOne('+'{'+f'{primarykey}'+'});}\nres.status(200).send("Se ha eliminado con exito");}\n}\n'
     code += f'module.exports={entidad[0].text};'
 
     os.makedirs("./backend/controllers", exist_ok=True)
