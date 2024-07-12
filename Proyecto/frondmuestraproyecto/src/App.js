@@ -79,7 +79,7 @@ function App() {
           {!zipFileUrl ? (
             <button onClick={handleFileUpload}>Subir Archivo</button>
           ) : (
-            <a href={zipFileUrl} download="proyecto.zip">
+            <a href={zipFileUrl} download="prueba.zip">
               <button>Descargar Proyecto</button>
             </a>
           )}
