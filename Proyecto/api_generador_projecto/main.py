@@ -1,3 +1,6 @@
+"""
+Este archivo contiene la inizializacion y los endpoints de la api
+"""
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -21,28 +24,20 @@ app.add_middleware(
 
 @app.post("/generate_project")
 async def load_xml(file: UploadFile = File(...)):
-    """
-    Este metodo recibe el xml y genera el projecto
-    """
     filename = file.filename
     project_dir = f"api's/{filename[:-4]}"
     if os.path.exists(f"schemas/{filename}"):
-        return "File alredy exists"
-    
+        return "File alredy exists"   
     with open(f"schemas/{filename}", "wb") as buffer:
-        buffer.write(await file.read())
-        
+        buffer.write(await file.read())     
     os.makedirs(project_dir, exist_ok=True)
-
     root = leer_xml(filename)
-    
     generate_script(root, filename)
-    create_docker(filename)
+    create_docker(root, filename)
     crear_api(root, filename)
-    
-    zip_filename = zip_filename = f"{project_dir}.zip"
+    zip_filename = f"{project_dir}.zip"
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, files in os.walk(project_dir):
+        for root, dirs, files in os.walk(project_dir):
             for file in files:
                 file_path = os.path.join(root, file)
                 arcname = os.path.relpath(file_path, project_dir)

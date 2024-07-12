@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import './styles/style.css';
 import axios from './api/axios';
+
 function App() {
-  
   const [file, setFile] = useState(null);
   const [zipFileUrl, setZipFileUrl] = useState(null);
+  const [zipFileName, setZipFileName] = useState(null);
 
   const handleFileChange = (event) => {
     const uploadedFile = event.target.files[0];
@@ -40,12 +41,19 @@ function App() {
         const zipBlob = new Blob([response.data], { type: 'application/zip' });
         const zipUrl = URL.createObjectURL(zipBlob);
         setZipFileUrl(zipUrl);
+        setZipFileName(file.name.replace(/\.[^/.]+$/, "") + ".zip");
       } else {
         console.error('Error al subir el archivo');
       }
     } catch (error) {
       console.error('Error de red:', error);
     }
+  };
+
+  const handleDownloadClick = () => {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // Espera 1 segundo antes de recargar la página
   };
 
   return (
@@ -79,11 +87,10 @@ function App() {
           {!zipFileUrl ? (
             <button onClick={handleFileUpload}>Subir Archivo</button>
           ) : (
-            <a href={zipFileUrl} download="prueba.zip">
+            <a href={zipFileUrl} download={zipFileName} onClick={handleDownloadClick}>
               <button>Descargar Proyecto</button>
             </a>
           )}
-
         </div>
       )}
     </div>
