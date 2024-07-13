@@ -666,11 +666,14 @@ def create_controller(ruta, entidades):
                 controllertext += f'\t\t{entidad[0].text.lower()} = {entidad[0].text}(\n'
                 atributos = entidad.findall("Atributo")
                 for i, atributo in enumerate(atributos):
-                    controllertext += f'\t\t\t{atributo[1].text.lower()}=data.{atributo[1].text.lower()}'
-                    if i < len(atributos) - 1:
-                        controllertext += ",\n"
+                    if atributo.find("llavePrimaria") is not None:
+                        controllertext += f'\t\t\t{atributo[1].text.lower()}={atributo[1].text.lower()},\n'
                     else:
-                        controllertext += "\n\t\t)\n"
+                        controllertext += f'\t\t\t{atributo[1].text.lower()}=data.{atributo[1].text.lower()}'
+                        if i < len(atributos) - 1:
+                            controllertext += ",\n"
+                        else:
+                            controllertext += "\n\t\t)\n"
                 controllertext += f'\t\t{entidad[0].text.lower()}_DAO.update_{entidad[0].text}({entidad[0].text.lower()})\n'
                 controllertext += f"\t\treturn 'Exitoso'\n"
                 controllertext += f'\texcept Exception as e:\n'
