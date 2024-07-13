@@ -534,6 +534,8 @@ def create_controller(ruta, entidades):
         controllertext += f"def create_{entidad[0].text}(data: schema):\n"
         controllertext += f'\ttry:\n'
         controllertext += f'\t\tcliente = Clientes('
+
+        atributos = entidad.findall("Atributo")
         for i, atributo in enumerate(atributos):
             controllertext += f'{atributo[1].text.lower}=data.{atributo[1].text.lower}\n'
             if i < len(atributos) - 1:
@@ -563,6 +565,7 @@ def get_{entidad[0].text}():
         
         controllertext += f"#READ BY UNIQUE_KEY\n"
 
+        atributos = entidad.findall("Atributo")
         for atributo in atributos:
             tipodedato = ""
             if atributo[0].text in str_types:
@@ -583,12 +586,14 @@ def get_{entidad[0].text}():
 
         controllertext += f"#UPDATE BY PRIMARY_KEY\n"
 
+        atributos = entidad.findall("Atributo")
         for atributo in atributos:
-            if atributo.find("llaveUnica") is not None:
+            if atributo.find("llavePrimaria") is not None:
                 controllertext += f'def update_{entidad[0].text}(data, {atributo[1].text.lower()}):\n'
                 controllertext += f'\ttry:\n'
                 controllertext += f'\t\t{entidad[0].text.lower()} = {entidad[0].text}(\n'
                 controllertext += f'\t\t\t{atributo[1].text.lower()}={atributo[1].text.lower()},\n'
+                atributos = entidad.findall("Atributo")
                 for i, atributo in enumerate(atributos):
                     controllertext += f'\t\t\t{atributo[1].text.lower()}=data.{atributo[1].text.lower()}\n'
                     if i < len(atributos) - 1:
@@ -603,7 +608,7 @@ def get_{entidad[0].text}():
                 controllertext += ""
 
         controllertext += f"#DELETE\n"
-        controllertext += f"def delete_{entidad[0].texr}(data):\n"
+        controllertext += f"def delete_{entidad[0].text}(data):\n"
         controllertext += f"\ttry:\n"
         controllertext += f"\t\t{entidad[0].text.lower()}_DAO.delete_{entidad[0].text}(data)\n"
         controllertext += f"\t\treturn 'Exitoso'\n"

@@ -45,7 +45,7 @@ async def load_xml(file: UploadFile = File(...)):
 
     # Remove the project directory
     shutil.rmtree(project_dir)
-
+    
     # Return the ZIP file
     return FileResponse(zip_filename, media_type='application/zip', filename=os.path.basename(zip_filename))
     
