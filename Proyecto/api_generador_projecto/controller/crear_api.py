@@ -270,16 +270,21 @@ from fastapi import APIRouter\n"""
 
         rutasprueba += f"{entidad[0].text}_routes = APIRouter()\n\n"
 
+        rutasprueba += f"#CREATE\n"
+
         rutasprueba += f'@{entidad[0].text}_routes.post("/create_{entidad[0].text}")\n'
         rutasprueba += (
             f"def create_{entidad[0].text}(request: {entidad[0].text}):\n"
         )
         rutasprueba += f"\treturn controller.create_{entidad[0].text}(request)\n\n"
+        
+        rutasprueba += f"#READ ALL\n"
         rutasprueba += f'@{entidad[0].text}_routes.get("/read_{entidad[0].text}")\n'
         rutasprueba += (
             f"def get_{entidad[0].text}_list():\n"
             + f"\treturn controller.get_{entidad[0].text}()\n\n"
         )
+        rutasprueba += f"#READ ALL BY PRIMARY_KEY\n"
         for atributo in atributos:
             if atributo.find("llavePrimaria") is not None:
                 tipodedato = ""
@@ -306,32 +311,12 @@ from fastapi import APIRouter\n"""
                     f"{tipodedato}):\n"
                     + f"\treturn controller.get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()})\n\n"
                 )
+            else:
+                rutasprueba += ""
 
-                rutasprueba += (
-                    f'@{entidad[0].text}_routes.put("/update_{entidad[0].text}/'
-                    +'{'
-                    +f'{atributo[1].text.lower()}'
-                    +'}'
-                    +'")\n'
-                )
-                rutasprueba += f"def update_{entidad[0].text}(request: {entidad[0].text}, {atributo[1].text.lower()}: {tipodedato}):\n"
-                rutasprueba += (
-                    f"\treturn controller.update_{entidad[0].text}(request, {atributo[1].text.lower()})\n\n"   
-                )
-
-                rutasprueba += (
-                    f'@{entidad[0].text}_routes.delete("/delete_{entidad[0].text}/'
-                    + "{"
-                    + f"{atributo[1].text.lower()}"
-                    + "}"
-                    + '")\n'
-                )
-                rutasprueba += f"def delete_{entidad[0].text}({atributo[1].text.lower()}: "
-                rutasprueba += (
-                    f"{tipodedato}):\n"
-                + f"\treturn controller.delete_{entidad[0].text}({atributo[1].text.lower()})\n\n"
-                )
-            elif atributo.find("llaveUnica") is not None:
+        rutasprueba += f"#READ BY UNIQUE_KEY\n"
+        for atributo in atributos:
+            if atributo.find("llaveUnica") is not None:
                 tipodedato = ""
                 if atributo[0].text in str_types:
                     tipodedato = "str"
@@ -357,6 +342,64 @@ from fastapi import APIRouter\n"""
                 rutasprueba += (
                     f"{tipodedato}):\n"
                     + f"\treturn controller.get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()})\n\n"
+                )
+            else:
+                rutasprueba += ""
+
+        rutasprueba += f"#UPDATE BY PRIMARY_KEY\n"
+        for atributo in atributos:
+            if atributo.find("llavePrimaria") is not None:
+                tipodedato = ""
+                if atributo[0].text in str_types:
+                    tipodedato = "str"
+                elif atributo[0].text in int_types:
+                    tipodedato = "int"
+                elif atributo[0].text in boolean_types:
+                    tipodedato = "bool"
+                elif atributo[0].text == float_types:
+                    tipodedato = "float"
+                elif atributo[0].text == bytes_types:
+                    tipodedato = "byte"
+                rutasprueba += (
+                    f'@{entidad[0].text}_routes.put("/update_{entidad[0].text}/'
+                    +'{'
+                    +f'{atributo[1].text.lower()}'
+                    +'}'
+                    +'")\n'
+                )
+                rutasprueba += f"def update_{entidad[0].text}(request: {entidad[0].text}, {atributo[1].text.lower()}: {tipodedato}):\n"
+                rutasprueba += (
+                    f"\treturn controller.update_{entidad[0].text}(request, {atributo[1].text.lower()})\n\n"   
+                )
+            else:
+                rutasprueba += ""
+        
+        rutasprueba += f"#DELETE BY PRIMARY_KEY\n"
+        for atributo in atributos:
+            if atributo.find("llavePrimaria") is not None:
+                tipodedato = ""
+                if atributo[0].text in str_types:
+                    tipodedato = "str"
+                elif atributo[0].text in int_types:
+                    tipodedato = "int"
+                elif atributo[0].text in boolean_types:
+                    tipodedato = "bool"
+                elif atributo[0].text == float_types:
+                    tipodedato = "float"
+                elif atributo[0].text == bytes_types:
+                    tipodedato = "byte"
+                
+                rutasprueba += (
+                    f'@{entidad[0].text}_routes.delete("/delete_{entidad[0].text}/'
+                    + "{"
+                    + f"{atributo[1].text.lower()}"
+                    + "}"
+                    + '")\n'
+                )
+                rutasprueba += f"def delete_{entidad[0].text}({atributo[1].text.lower()}: "
+                rutasprueba += (
+                    f"{tipodedato}):\n"
+                + f"\treturn controller.delete_{entidad[0].text}({atributo[1].text.lower()})\n\n"
                 )
             else:
                 rutasprueba += ""
@@ -454,27 +497,43 @@ from """
             else:
                 DAOtextprueba += f""
 
-        DAOtextprueba += "#UPDATE\n"
+        DAOtextprueba += "#UPDATE BY PRIMARY_KEY\n"
         
-        DAOtextprueba += f"\tdef update_{entidad[0].text}(self, {entidad[0].text.lower()}: {entidad[0].text}) -> {entidad[0].text}:\n"
-        DAOtextprueba += "\t\ttry:\n"
-        DAOtextprueba += f"\t\t\texisting_{entidad[0].text.lower()} = self.db.query({entidad[0].text}).filter({entidad[0].text}.{atributo[1].text.lower()} == {entidad[0].text.lower()}.{atributo[1].text.lower()}).first()\n"
-        DAOtextprueba += f"\t\t\tif not existing_{entidad[0].text.lower()}:\n"
-        DAOtextprueba += f'\t\t\t\traise HTTPException(status_code=404, detail="{entidad[0].text} no encontrado")\n'
-        DAOtextprueba += f"\t\t\tfor key, value in {entidad[0].text.lower()}.__dict__.items():\n"
-        DAOtextprueba += (
-            f"\t\t\t\tif key != '_sa_instance_state':\n"+
-            f"\t\t\t\t\tsetattr(existing_{entidad[0].text.lower()}, key, value)\n"
-        )
-        DAOtextprueba += "\t\t\tself.db.commit()\n"
-        DAOtextprueba += (
-            f"\t\t\tself.db.refresh(existing_{entidad[0].text.lower()})\n"
-        )
-        DAOtextprueba += "\t\texcept IntegrityError:\n"
-        DAOtextprueba += "\t\t\tself.db.rollback()\n"
-        DAOtextprueba += f'\t\t\traise HTTPException(status_code=400, detail="Error al actualizar {entidad[0].text}")\n'
-        DAOtextprueba += f"\t\treturn existing_{entidad[0].text.lower()}\n"
+        for atributo in atributos:
             
+            if atributo.find("llavePrimaria") is not None:
+                tipodedato = ""
+                if atributo[0].text in str_types:
+                    tipodedato = "str"
+                elif atributo[0].text in int_types:
+                    tipodedato = "int"
+                elif atributo[0].text in boolean_types:
+                    tipodedato = "bool"
+                elif atributo[0].text == float_types:
+                    tipodedato = "float"
+                elif atributo[0].text == bytes_types:
+                    tipodedato = "byte"
+                DAOtextprueba += f"\tdef update_{entidad[0].text}(self, {entidad[0].text.lower()}: {entidad[0].text}) -> {entidad[0].text}:\n"
+                DAOtextprueba += "\t\ttry:\n"
+                DAOtextprueba += f"\t\t\texisting_{entidad[0].text.lower()} = self.db.query({entidad[0].text}).filter({entidad[0].text}.{atributo[1].text.lower()} == {entidad[0].text.lower()}.{atributo[1].text.lower()}).first()\n"
+                DAOtextprueba += f"\t\t\tif not existing_{entidad[0].text.lower()}:\n"
+                DAOtextprueba += f'\t\t\t\traise HTTPException(status_code=404, detail="{entidad[0].text} no encontrado")\n'
+                DAOtextprueba += f"\t\t\tfor key, value in {entidad[0].text.lower()}.__dict__.items():\n"
+                DAOtextprueba += (
+                    f"\t\t\t\tif key != '_sa_instance_state':\n"+
+                    f"\t\t\t\t\tsetattr(existing_{entidad[0].text.lower()}, key, value)\n"
+                )
+                DAOtextprueba += "\t\t\tself.db.commit()\n"
+                DAOtextprueba += (
+                    f"\t\t\tself.db.refresh(existing_{entidad[0].text.lower()})\n"
+                )
+                DAOtextprueba += "\t\texcept IntegrityError:\n"
+                DAOtextprueba += "\t\t\tself.db.rollback()\n"
+                DAOtextprueba += f'\t\t\traise HTTPException(status_code=400, detail="Error al actualizar {entidad[0].text}")\n'
+                DAOtextprueba += f"\t\treturn existing_{entidad[0].text.lower()}\n"
+                    
+            else:
+                DAOtextprueba += f""
 
         DAOtextprueba += "#DELETE\n"
 
@@ -533,15 +592,18 @@ def create_controller(ruta, entidades):
 
         controllertext += f"def create_{entidad[0].text}(data: schema):\n"
         controllertext += f'\ttry:\n'
-        controllertext += f'\t\tcliente = Clientes('
+        controllertext += f'\t\t{entidad[0].text.lower()} = {entidad[0].text}('
 
         atributos = entidad.findall("Atributo")
         for i, atributo in enumerate(atributos):
-            controllertext += f'{atributo[1].text.lower}=data.{atributo[1].text.lower}\n'
-            if i < len(atributos) - 1:
-                controllertext += ", "
+            if atributo.find("autoincrementable") is not None:
+                controllertext +=""
             else:
-                controllertext += ")\n"
+                controllertext += f'{atributo[1].text.lower()}=data.{atributo[1].text.lower()}'
+                if i < len(atributos) - 1:
+                    controllertext += ", "
+                else:
+                    controllertext += ")\n"
         controllertext += f'\t\t{entidad[0].text.lower()}_DAO.create_{entidad[0].text}({entidad[0].text.lower()})\n'
         controllertext += f"\t\treturn 'Exitoso'\n"
         controllertext += f"\texcept Exception as e:\n"
@@ -549,17 +611,27 @@ def create_controller(ruta, entidades):
 
         controllertext += f"#READ ALL\n"
 
-        controllertext += f"""
-def get_{entidad[0].text}():
-    return {entidad[0].text.lower()}_DAO.get_{entidad[0].text}_list()\n
-        """    
+        controllertext += f'def get_{entidad[0].text}():\n'
+        controllertext += f'\treturn {entidad[0].text.lower()}_DAO.get_{entidad[0].text}_list()\n\n' 
+
         controllertext += f"#READ BY PRIMARY_KEY\n"
 
         atributos = entidad.findall("Atributo")
         for atributo in atributos:
+            tipodedato = ""
+            if atributo[0].text in str_types:
+                tipodedato = "str"
+            elif atributo[0].text in int_types:
+                tipodedato = "int"
+            elif atributo[0].text in boolean_types:
+                tipodedato = "bool"
+            elif atributo[0].text == float_types:
+                tipodedato = "float"
+            elif atributo[0].text == bytes_types:
+                tipodedato = "byte"
             if atributo.find("llavePrimaria") is not None:
-                controllertext += f'def get_{entidad[0].text}_{atributo[1].text.lower()}(id):\n'
-                controllertext += f'return {entidad[0].text.lower()}_DAO.get_{entidad[0].text}(id)'
+                controllertext += f'def get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()}: {tipodedato}) -> {entidad[0].text}:\n'
+                controllertext += f'\treturn {entidad[0].text.lower()}_DAO.get_{entidad[0].text}({atributo[1].text.lower()})\n\n'
             else:
                 controllertext += ""
         
@@ -580,7 +652,7 @@ def get_{entidad[0].text}():
                 tipodedato = "byte"
             if atributo.find("llaveUnica") is not None:
                 controllertext += f'def get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()}: {tipodedato}) -> {entidad[0].text}:\n'
-                controllertext += f'return {entidad[0].text.lower()}_DAO.get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()})\n\n'
+                controllertext += f'\treturn {entidad[0].text.lower()}_DAO.get_{entidad[0].text}_{atributo[1].text.lower()}({atributo[1].text.lower()})\n\n'
             else:
                 controllertext += ""
 
@@ -592,18 +664,17 @@ def get_{entidad[0].text}():
                 controllertext += f'def update_{entidad[0].text}(data, {atributo[1].text.lower()}):\n'
                 controllertext += f'\ttry:\n'
                 controllertext += f'\t\t{entidad[0].text.lower()} = {entidad[0].text}(\n'
-                controllertext += f'\t\t\t{atributo[1].text.lower()}={atributo[1].text.lower()},\n'
                 atributos = entidad.findall("Atributo")
                 for i, atributo in enumerate(atributos):
-                    controllertext += f'\t\t\t{atributo[1].text.lower()}=data.{atributo[1].text.lower()}\n'
+                    controllertext += f'\t\t\t{atributo[1].text.lower()}=data.{atributo[1].text.lower()}'
                     if i < len(atributos) - 1:
                         controllertext += ",\n"
                     else:
-                        controllertext += "\n)\n"
+                        controllertext += "\n\t\t)\n"
                 controllertext += f'\t\t{entidad[0].text.lower()}_DAO.update_{entidad[0].text}({entidad[0].text.lower()})\n'
                 controllertext += f"\t\treturn 'Exitoso'\n"
                 controllertext += f'\texcept Exception as e:\n'
-                controllertext += f'\t\traise HTTPException(status_code=400, detail=f"'+'{'+'e})\n\n'
+                controllertext += f'\t\traise HTTPException(status_code=400, detail=f"'+'{'+'e}")\n\n'
             else:
                 controllertext += ""
 
