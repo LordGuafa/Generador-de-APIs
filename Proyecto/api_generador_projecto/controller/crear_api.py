@@ -587,7 +587,8 @@ uvicorn
 sqlalchemy
 pymysql
 pydantic
-python-dotenv    
+python-dotenv 
+cryptografi
 """
     file_path = f"{ruta}/requirements.txt"
     with open(file_path, "w", encoding="utf-8") as file:
