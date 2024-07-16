@@ -2,6 +2,7 @@
 Este archivo se encarga de crear los docker donde se desplegara la aplicacion
 """
 
+
 def create_dockerfile_backend(ruta):
     """
     Este metodo crea el archivo .Dockerfile para el backend
@@ -23,6 +24,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
     file_path = f"{ruta}/backend.Dockerfile"
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(code)
+
 
 def create_docker(root, filename):
     """
@@ -48,11 +50,11 @@ services:
       - ./database:/docker-entrypoint-initdb.d
     networks:
       - api-network
-      
+
   api-backend:
     image: api-backend
     container_name: api-backend
-    build: 
+    build:
       context: .
       dockerfile: backend.Dockerfile
     ports:
@@ -61,7 +63,7 @@ services:
       - api-database
     networks:
       - api-network
-      
+
 volumes:
   api-data:
     driver: local
@@ -72,4 +74,3 @@ networks:
     file_path = f"{ruta}/docker-compose.yml"
     with open(file_path, 'w', encoding="utf-8") as file:
         file.write(code)
-        
