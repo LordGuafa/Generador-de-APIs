@@ -1,0 +1,30 @@
+version: '3.3'
+services:
+  apigenerator-backend:
+    image: pigenerator-backend
+    container_name: pigenerator-backend
+    build: 
+      context: .
+      dockerfile: backend.Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - api-network
+
+  apigenerator-fronted:
+    image: apicreate-fronted
+    container_name: apicreate-fronted
+    build: 
+      context: .
+      dockerfile: frontend.Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - api-network
+volumes:
+  api-data:
+    driver: local
+
+networks:
+  api-network:
+    driver: bridge

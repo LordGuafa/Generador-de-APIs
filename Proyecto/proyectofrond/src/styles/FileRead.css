@@ -1,0 +1,67 @@
+.container2 {
+    position: relative;
+    text-align: center;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 1075px;
+    overflow-x: auto; 
+    white-space: nowrap;
+    
+}
+
+h1 {
+    font-size: 35px;
+    margin-bottom: 20px;
+    color: #0073e6;
+}
+.upload-section {
+    border: 2px dashed #0073e6;
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+}
+.component-content {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: Space-evenly;
+    justify-content: center;
+    align-items: center;
+}
+.component-content div{
+    flex-grow: 1;
+}
+.file-info {
+    display: flex;
+    justify-content: Space-evenly;
+    width: 200px;
+    justify-content: center;
+    align-items: center;
+}
+.file-info div {
+    margin: 0;
+    width: 100px;
+    flex-grow: 1;
+}
+.file-info img {
+    width: 100px;
+    flex-grow: 1;
+}
+.selectors p{
+    font-size: 20px;
+    color: #005bb5;
+    margin: 5px;
+}
+.selectors select{
+    border: 2px dotted #0073e6;
+    border-radius: 10px;
+    font-size: 20px;
+    color: #005bb5;
+    margin: 5px;
+}
+.atras {
+    position: relative;
+    left: -40%;
+}
